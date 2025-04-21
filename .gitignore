@@ -1,0 +1,48 @@
+# -----------------------
+# FRONTEND (Next.js)
+# -----------------------
+
+# dependencies
+/frontend/node_modules
+/frontend/.pnp
+/frontend/pnp.js
+/frontend/yarn/install-state.gz
+
+# testing
+/frontend/coverage
+
+# next.js
+/frontend/.next/
+/frontend/out/
+
+/frontend/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+/frontend/.env*.local
+
+# vercel
+/frontend/.vercel
+
+# typescript
+/frontend/*.tsbuildinfo
+/frontend/next-env.d.ts
+
+
+# -----------------------
+# BACKEND (Django)
+# -----------------------
+
+# Python virtual environment
+/backend/venv/
+
+# Django environment variables
+/backend/.env
