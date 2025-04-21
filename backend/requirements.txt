@@ -1,0 +1,22 @@
+# Core Django
+Django>=4.2
+
+# Django REST Framework for APIs
+djangorestframework>=3.14.0
+
+# PostgreSQL support (if using Postgres)
+psycopg2-binary>=2.9.9
+
+# CORS support
+django-cors-headers>=4.3.1
+
+# JWT Authentication (optional, if used)
+djangorestframework-simplejwt>=5.3.1
+
+# Environment variable management
+python-dotenv>=1.0.1
+
+# For handling media files (optional)
+Pillow>=10.2.0
+
+dj-database-url>=1.0.0
