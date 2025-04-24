@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
 
@@ -15,6 +15,8 @@ type MyTokenPayload = {
 
 const Page = () => {
   const router = useRouter()
+  const [isAuthorized, setIsAuthorized] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const access = localStorage.getItem('access')
@@ -26,20 +28,34 @@ const Page = () => {
 
     try {
       const decoded_token = jwtDecode<MyTokenPayload>(access)
-      console.log(decoded_token);
-      (decoded_token.user_id === admin_id) ? router.push('/adminsite/dashboard') : router.push('/')
+      console.log(decoded_token)
+
+      if (decoded_token.user_id === admin_id) {
+        setIsAuthorized(true)
+      } else {
+        router.push('/')
+      }
     } catch (e) {
       console.error('error in loading the dashboard', e)
       router.push('/')
+    } finally {
+      setLoading(false)
     }
-
   }, [])
 
-  return (
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen">
+        <p className="text-xl font-semibold">Loading...</p>
+      </div>
+    )
+  }
+
+  return isAuthorized ? (
     <div>
       i am dashboard
     </div>
-  )
+  ) : null
 }
 
 export default Page
