@@ -37,12 +37,27 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "accounts",
+    "login",
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "login.email_auth.EmailAuthentication",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 
 AUTH_USER_MODEL = "accounts.CustomUserModel"
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
+
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -139,3 +154,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# allow the frontedn to interact with backend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]

@@ -21,6 +21,6 @@ class RegisterView(APIView):
                 password=request.data.get("password"),
             )
 
-            return Response({"message": "Login successfull"})
+            return Response({"message": "Register successfull"})
 
         return Response(serializer.errors)
