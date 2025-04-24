@@ -42,6 +42,7 @@ export default function Navbar() {
 
         setLoginError(null)
         setLoginLoading(true)
+        console.log(loginForm)
 
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/login/', loginForm, {
