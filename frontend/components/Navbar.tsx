@@ -17,6 +17,7 @@ export default function Navbar() {
     const [loginForm, setLoginForm] = useState({ email: '', password: '' })
     const [loginError, setLoginError] = useState<string | null>(null)
     const [loginLoading, setLoginLoading] = useState(false)
+    const [loginstatus, setloginstatus] = useState(false)
 
     // Register form state
     const [registerForm, setRegisterForm] = useState({
@@ -42,7 +43,6 @@ export default function Navbar() {
 
         setLoginError(null)
         setLoginLoading(true)
-        console.log(loginForm)
 
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/login/', loginForm, {
@@ -51,12 +51,14 @@ export default function Navbar() {
 
             localStorage.setItem('access', response.data.access)
             localStorage.setItem('refresh', response.data.refresh)
+            localStorage.setItem('status', response.data.status)
 
             console.log(response.data)
 
             if (response.data.message === 'Login successful') {
+                setloginstatus(true)
                 setShowLogin(false)
-                if (response.data.isadmin) {
+                if (response.data.is_admin) {
                     router.push('/adminsite/dashboard')
                 } else {
                     router.push('/')
@@ -99,6 +101,13 @@ export default function Navbar() {
         }
     }
 
+    const handlelogout = () => {
+        setloginstatus(false)
+        localStorage.removeItem('access')
+        localStorage.removeItem('refresh')
+        localStorage.removeItem('status')
+    }
+
     return (
         <div>
             <nav className="bg-white shadow-md px-4 py-3 flex items-center justify-between">
@@ -122,12 +131,24 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                    onClick={() => setShowLogin(true)}
-                >
-                    Login
-                </button>
+                {
+                    !loginstatus ?
+                        <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                            onClick={() => setShowLogin(true)}
+                        >
+                            Login
+                        </button> :
+                        <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                            onClick={handlelogout}
+                        >
+                            Logout
+                        </button>
+                }
+
+
+
             </nav>
 
             {showLogin && (
