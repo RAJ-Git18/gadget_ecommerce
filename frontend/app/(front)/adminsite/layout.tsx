@@ -79,9 +79,7 @@ export default function RootLayout({
             </div>
 
             {/* Main Content */}
-            <div className="w-[85%] p-6">
-                {children}
-            </div>
+            {children}
         </div>
     );
 }

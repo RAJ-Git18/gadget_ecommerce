@@ -1,12 +1,30 @@
 'use client'
 
-import Navbar from '@/components/Navbar'
+import Image from 'next/image';
+import CarouselBestProducts from '@/components/CarouselBestProducts';
 
-export default function AuthPage() {
-
+export default function HomePage() {
   return (
-    <div>
-    </div>
+    <div className="w-full flex flex-col items-center mt-5">
 
+      {/* Hero Image */}
+      <div className="relative w-[90%] h-[600px]">
+        <Image
+          src="/images/mackbook_front_poster.png"
+          fill
+          objectFit="cover"
+          alt="Macbook Front Poster"
+        />
+      </div>
+
+      {/* Best Selling Products Section */}
+      <div className="w-full py-10">
+        <h2 className="text-center text-3xl font-bold mb-6">Best Selling Products</h2>
+        <div className="max-w-6xl mx-auto px-4">
+          <CarouselBestProducts />
+        </div>
+      </div>
+
+    </div>
   )
 }
