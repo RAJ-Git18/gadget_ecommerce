@@ -36,6 +36,9 @@ yarn-error.log*
 /frontend/*.tsbuildinfo
 /frontend/next-env.d.ts
 
+# .env file
+/frontend/.env
+
 
 # -----------------------
 # BACKEND (Django)
