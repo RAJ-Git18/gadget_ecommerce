@@ -3,6 +3,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
+import Link from "next/link";
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function RootLayout({
     children,
@@ -10,10 +14,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true)
         const access_token = localStorage.getItem('access');
         const refresh_token = localStorage.getItem('refresh');
 
@@ -24,7 +29,7 @@ export default function RootLayout({
 
         const checkAdmin = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/protected/', {
+                const response = await axios.get(`${apiUrl}/api/protected/`, {
                     headers: { Authorization: `Bearer ${access_token}` }
                 });
 
@@ -36,7 +41,7 @@ export default function RootLayout({
             } catch (e) {
                 console.error("Access token invalid, trying refresh...", e);
                 try {
-                    const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+                    const response = await axios.post(`${apiUrl}/api/token/refresh/`, {
                         refresh: refresh_token
                     });
 
@@ -44,7 +49,7 @@ export default function RootLayout({
                     router.push('/adminsite/dashboard');
                 } catch (e) {
                     console.error('Refresh token invalid:', e);
-                    router.push('/');
+                    router.push('/login');
                 }
             } finally {
                 setIsLoading(false);  // Always stop loading after all tries
@@ -56,9 +61,7 @@ export default function RootLayout({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-screen w-screen">
-                <div className="text-2xl font-bold text-gray-800">Loading...</div>
-            </div>
+            <Loader />
         );
     }
 
@@ -72,9 +75,12 @@ export default function RootLayout({
             <div className="w-[15%] bg-gray-800 text-white p-4">
                 <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
                 <ul className="space-y-4">
-                    <li className="hover:text-gray-300 cursor-pointer">Dashboard</li>
-                    <li className="hover:text-gray-300 cursor-pointer">Products</li>
-                    <li className="hover:text-gray-300 cursor-pointer">Users</li>
+                    <Link href='/adminsite/dashboard'><li className="hover:text-gray-300 cursor-pointer">Dashboard</li>
+                    </Link>
+                    <Link href='/adminsite/product'><li className="hover:text-gray-300 cursor-pointer">Products</li>
+                    </Link>
+                    <Link href='/adminsite/users'><li className="hover:text-gray-300 cursor-pointer">Users</li>
+                    </Link>
                 </ul>
             </div>
 

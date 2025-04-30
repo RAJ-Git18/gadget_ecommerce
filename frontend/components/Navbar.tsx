@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useContext, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShoppingCart } from 'lucide-react'
+
 
 export default function Navbar() {
     const router = useRouter()
@@ -11,7 +12,6 @@ export default function Navbar() {
     const [isloggedin, setisloggedin] = useState(false)
 
     useEffect(() => {
-        console.log('i am here')
         localStorage.getItem('status') === 'Logged In' && setisloggedin(true)
 
     }, [])
@@ -27,6 +27,7 @@ export default function Navbar() {
         localStorage.removeItem('refresh')
         localStorage.removeItem('status')
     }
+
 
 
     return (

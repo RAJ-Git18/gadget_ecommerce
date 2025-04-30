@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "login",
+    "product",
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -112,6 +113,12 @@ DATABASES = {
         ssl_require=True,  # important for cloud DBs like Render
     )
 }
+
+
+# for the media files
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 # Password validation

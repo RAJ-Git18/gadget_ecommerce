@@ -4,6 +4,14 @@ import Image from 'next/image';
 import CarouselBestProducts from '@/components/CarouselBestProducts';
 
 export default function HomePage() {
+
+  const scrollToPosition = () => {
+    window.scrollTo({
+      top: 700,        // pixels from the top
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div className="w-full flex flex-col items-center mt-5">
 
@@ -15,6 +23,11 @@ export default function HomePage() {
           objectFit="cover"
           alt="Macbook Front Poster"
         />
+
+        <button
+          className="bg-white z-10 absolute bottom-5 right-5 p-4 rounded-lg text-black shadow-md"
+          onClick={scrollToPosition}
+        >Get Started</button>
       </div>
 
       {/* Best Selling Products Section */}
