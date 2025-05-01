@@ -42,6 +42,7 @@ export default function ProductForm() {
 
   useEffect(() => {
     const getProduct = async () => {
+      setisLoading(true)
       try {
         const response = await axios.get(`${apiUrl}/api/getproducts/`);
         if (response.status === 200) {
@@ -121,7 +122,6 @@ export default function ProductForm() {
   };
 
   const DeleteProduct = async (productid: string) => {
-    setisLoading(true);
     try {
       const response = await axios.delete(`${apiUrl}/api/deleteproduct/${productid}/`);
       if (response.status === 200) {
@@ -129,14 +129,12 @@ export default function ProductForm() {
       }
     } catch (error: any) {
       alert('Product cannot be deleted');
-    } finally {
-      setisLoading(false);
-    }
+    } 
   };
 
   if (isLoading) {
     return (
-      <div className="h-screen w-screen flex items-center">
+      <div className="h-screen w-[85%] flex justify-center items-center mx-auto ">
         <Loader />
       </div>
     );

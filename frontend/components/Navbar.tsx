@@ -19,6 +19,7 @@ export default function Navbar() {
         localStorage.removeItem('access')
         localStorage.removeItem('refresh')
         localStorage.removeItem('status')
+        router.push('/')
     }
 
     return (
