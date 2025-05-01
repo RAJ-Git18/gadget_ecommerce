@@ -10,4 +10,5 @@ class ProductModel(models.Model):
     price = models.PositiveIntegerField()
     stock = models.PositiveIntegerField()
     category = models.CharField(max_length=100)
+    description = models.TextField()
 

@@ -17,7 +17,8 @@ urlpatterns = [
     path("login/", LoginView.as_view()),
     path("protected/", ProtectedView.as_view()),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("", ProductView.as_view(), name="produts"),
+    path("getproducts/", ProductView.as_view(), name="produts"),
+    path("deleteproduct/<uuid:productid>/", ProductView.as_view(), name="delete_product"),
 ]
 
 

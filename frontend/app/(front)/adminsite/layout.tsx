@@ -40,6 +40,7 @@ export default function RootLayout({
                 }
             } catch (e) {
                 console.error("Access token invalid, trying refresh...", e);
+                // window.location.reload()
                 try {
                     const response = await axios.post(`${apiUrl}/api/token/refresh/`, {
                         refresh: refresh_token
@@ -72,7 +73,7 @@ export default function RootLayout({
     return (
         <div className="flex min-h-screen">
             {/* Sidebar */}
-            <div className="w-[15%] bg-gray-800 text-white p-4">
+            <div className="w-[15%] bg-gray-800 text-white p-4 fixed h-screen mt-14">
                 <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
                 <ul className="space-y-4">
                     <Link href='/adminsite/dashboard'><li className="hover:text-gray-300 cursor-pointer">Dashboard</li>

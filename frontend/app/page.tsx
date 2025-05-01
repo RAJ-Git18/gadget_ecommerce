@@ -13,7 +13,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center mt-5">
+    <div className="w-full flex flex-col items-center mt-24">
 
       {/* Hero Image */}
       <div className="relative w-[90%] h-[600px]">

@@ -5,21 +5,14 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShoppingCart } from 'lucide-react'
 
-
 export default function Navbar() {
     const router = useRouter()
-
     const [isloggedin, setisloggedin] = useState(false)
+    const [search, setSearch] = useState('')
 
     useEffect(() => {
         localStorage.getItem('status') === 'Logged In' && setisloggedin(true)
-
     }, [])
-
-
-    const [search, setSearch] = useState('')
-    // const [loginstatus, setloginstatus] = useState(false)
-
 
     const handleLogout = () => {
         setisloggedin(false)
@@ -28,18 +21,15 @@ export default function Navbar() {
         localStorage.removeItem('status')
     }
 
-
-
     return (
-        <nav className="bg-white shadow-md px-20 py-3 flex items-center justify-between ">
-
+        <nav className="bg-white/80 shadow-md px-20 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b border-gray-200">
             <Link href="/" className="text-xl font-bold text-gray-800">Bits&Bytes</Link>
 
             <div className="flex items-center gap-36">
-                <div className="flex space-x-6 mb-2 font-semibold">
-                    <Link href="/" className="text-gray-900 font-semibold hover:font-bold">Home</Link>
-                    <Link href="/about" className="text-gray-900 font-semibold hover:font-bold">About</Link>
-                    <Link href="/shop" className="text-gray-900 font-semibold hover:font-bold">Shop</Link>
+                <div className="flex space-x-6 font-semibold">
+                    <Link href="/" className="text-gray-900 hover:text-slate-700 transition-colors">Home</Link>
+                    <Link href="/about" className="text-gray-900 hover:text-slate-700 transition-colors">About</Link>
+                    <Link href="/shop" className="text-gray-900 hover:text-slate-700 transition-colors">Shop</Link>
                 </div>
 
                 <div className="w-full max-w-md">
@@ -54,17 +44,22 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-5">
-                <ShoppingCart className="h-8 w-8" />
+                <button
+                    onClick={() => router.push('/cart')}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                    <ShoppingCart className="h-6 w-6" />
+                </button>
                 {!isloggedin ? (
                     <button
-                        className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-950 transition"
+                        className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                         onClick={() => router.push('/login')}
                     >
                         Login
                     </button>
                 ) : (
                     <button
-                        className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-950 transition"
+                        className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                         onClick={handleLogout}
                     >
                         Logout

@@ -1,28 +1,60 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Plus, Trash } from 'lucide-react';
+import axios from 'axios';
+import Loader from '@/components/Loader';
+import Image from 'next/image';
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+interface FormDataInterface {
+  name: string;
+  price: string;
+  stock: string;
+  category: 'featured' | 'best';
+  details: string;
+  image: File | null;
+}
+
+interface ProductDataInterface {
+  productid: string;
+  name: string;
+  price: string;
+  stock: string;
+  category: 'featured' | 'best';
+  details: string;
+  image: string | null;
+}
 
 export default function ProductForm() {
-  interface FormDataInterface {
-    name: string;
-    price: string;
-    stock: string;
-    category: string;
-    details: string;
-    image: File | null;
-  }
-
+  const [productData, setproductData] = useState<ProductDataInterface[]>([]);
   const [formData, setFormData] = useState<FormDataInterface>({
     name: '',
     price: '',
     stock: '',
-    category: 'all',
+    category: 'featured',
     details: '',
     image: null,
   });
-
   const [toggleForm, setToggleForm] = useState<boolean>(false);
+  const [isLoading, setisLoading] = useState(false);
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/getproducts/`);
+        if (response.status === 200) {
+          setproductData(response.data.message);
+        }
+      } catch (error: any) {
+        alert('Please try again.');
+      } finally {
+        setisLoading(false);
+      }
+    };
+    getProduct();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,52 +75,91 @@ export default function ProductForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const productData = new FormData();
-    productData.append('name', formData.name);
-    productData.append('price', formData.price);
-    productData.append('stock', formData.stock);
-    productData.append('category', formData.category);
-    productData.append('details', formData.details);
+    const form = new FormData();
+    form.append('name', formData.name);
+    form.append('price', formData.price);
+    form.append('stock', formData.stock);
+    form.append('category', formData.category);
+    form.append('description', formData.details);
     if (formData.image) {
-      productData.append('image', formData.image);
+      form.append('image', formData.image);
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/`, {
-        method: 'POST',
-        body: productData,
+      const response = await axios.post(`${apiUrl}/api/getproducts/`, form, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert('Product added successfully!');
-        setFormData({
-          name: '',
-          price: '',
-          stock: '',
-          category: 'all',
-          details: '',
-          image: null,
-        });
-        setToggleForm(false);
-      } else {
-        alert(`Failed: ${data.message || 'Something went wrong'}`);
+      if (response.status === 201) {
+        setisLoading(true);
+        try {
+          const response2 = await axios.get(`${apiUrl}/api/getproducts/`);
+          if (response2.status === 200) {
+            setproductData(response2.data.message);
+            setToggleForm(false);
+            setFormData({
+              name: '',
+              price: '',
+              stock: '',
+              category: 'featured',
+              details: '',
+              image: null,
+            });
+          }
+        } catch (error: any) {
+          alert('Please try again.');
+        } finally {
+          setisLoading(false);
+        }
       }
-    } catch (error) {
-      console.error(error);
-      alert('An error occurred while uploading.');
+    } catch (error: any) {
+      alert('Unable to create new product. Please try again.');
+      console.error(error.response?.data || error.message);
     }
   };
 
+  const DeleteProduct = async (productid: string) => {
+    setisLoading(true);
+    try {
+      const response = await axios.delete(`${apiUrl}/api/deleteproduct/${productid}/`);
+      if (response.status === 200) {
+        setproductData(prev => prev.filter(product => product.productid !== productid));
+      }
+    } catch (error: any) {
+      alert('Product cannot be deleted');
+    } finally {
+      setisLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto p-4">
+    <div className="fixed right-0 top-20 bottom-0 w-[85%] bg-white shadow-lg overflow-y-auto transition-all duration-300">
       {toggleForm ? (
         <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Add New Product</h2>
             <button
-              onClick={() => setToggleForm(false)}
+              onClick={() => {
+                setToggleForm(false);
+                setFormData({
+                  name: '',
+                  price: '',
+                  stock: '',
+                  category: 'featured',
+                  details: '',
+                  image: null,
+                });
+              }}
               className="text-gray-500 hover:text-gray-700"
             >
               <X size={24} />
@@ -102,120 +173,145 @@ export default function ProductForm() {
               value={formData.name}
               onChange={handleChange}
               placeholder="Product Name"
-              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full border border-gray-300 p-2 rounded"
               required
             />
-
             <input
               type="number"
               name="price"
               value={formData.price}
               onChange={handleChange}
               placeholder="Price"
-              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full border border-gray-300 p-2 rounded"
               required
             />
-
             <input
               type="number"
               name="stock"
               value={formData.stock}
               onChange={handleChange}
               placeholder="Stock Quantity"
-              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full border border-gray-300 p-2 rounded"
               required
             />
-
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full border border-gray-300 p-2 rounded"
+              required
             >
               <option value="featured">Featured</option>
               <option value="best">Best Selling</option>
             </select>
-
             <textarea
               name="details"
               value={formData.details}
               onChange={handleChange}
-              placeholder="Product description (features, benefits, etc.)"
-              className="w-full border border-gray-300 p-2 rounded min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Product description"
+              className="w-full border border-gray-300 p-2 rounded min-h-[100px]"
               rows={4}
               required
             />
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="w-full border border-gray-300 p-2 rounded file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="w-full border border-gray-300 p-2 rounded"
                 required
               />
             </div>
-
             <button
               type="submit"
-              className="w-full bg-slate-800 text-white py-2 px-4 rounded hover:bg-slate-950 transition focus:outline-none focus:ring-2 focus:ring-slate-800 focus:ring-offset-2"
+              className="w-full bg-slate-800 text-white py-2 px-4 rounded hover:bg-slate-950"
             >
               Add Product
             </button>
           </form>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow">
-          <div className="flex justify-between items-center p-4 border-b">
-            <h2 className="text-xl font-bold">Products</h2>
-            <button
-              onClick={() => setToggleForm(true)}
-              className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded hover:bg-slate-950 transition"
-            >
-              <Plus size={18} />
-              Create Product
-            </button>
-          </div>
-
-          <div className="p-4 overflow-x-auto">
-            <table className="min-w-full mx-auto bg-white border border-gray-200">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-3 px-6 border-b">Image</th>
-                  <th className="py-3 px-6 border-b">Name</th>
-                  <th className="py-3 px-6 border-b">Price</th>
-                  <th className="py-3 px-6 border-b">Stock</th>
-                  <th className="py-3 px-6 border-b">Best Selling</th>
-                  <th className="py-3 px-6 border-b">Featured</th>
-                  <th className="py-3 px-6 border-b">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="hover:bg-gray-50 text-center">
-                  <td className="py-3 px-6 border-b">
-                    <div className="h-12 w-12 bg-gray-200 mx-auto rounded"></div>
-                  </td>
-                  <td className="py-3 px-6 border-b">Sample Product</td>
-                  <td className="py-3 px-6 border-b">$29.99</td>
-                  <td className="py-3 px-6 border-b">50</td>
-                  <td className="py-3 px-6 border-b">
-                    <span className="text-green-500">✓</span>
-                  </td>
-                  <td className="py-3 px-6 border-b">
-                    <span className="text-green-500">✓</span>
-                  </td>
-                  <td className="py-3 px-6 border-b">
-                    <button className="text-gray-500 hover:text-blue-700 mr-2">
-                      Edit
-                    </button>
-                    <button className="text-red-500 hover:text-red-700">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            {productData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <p className="text-gray-500 text-lg">No products available</p>
+                <button
+                  onClick={() => setToggleForm(true)}
+                  className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded hover:bg-slate-950"
+                >
+                  <Plus size={18} />
+                  Add Your First Product
+                </button>
+              </div>
+            ) : (
+              <table className="min-w-full bg-white border border-gray-200">
+                <thead className="sticky top-0 bg-gray-100 z-10">
+                  <tr>
+                    <th className="py-3 px-6 border-b">Image</th>
+                    <th className="py-3 px-6 border-b">Name</th>
+                    <th className="py-3 px-6 border-b">Price</th>
+                    <th className="py-3 px-6 border-b">Stock</th>
+                    <th className="py-3 px-6 border-b">Best Selling</th>
+                    <th className="py-3 px-6 border-b">Featured</th>
+                    <th className="py-3 px-6 border-b">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productData.map((item) => (
+                    <tr key={item.productid} className="hover:bg-gray-50 text-center">
+                      <td className="py-3 px-6 border-b">
+                        <div className="mx-auto w-[50px] h-[50px] rounded overflow-hidden">
+                          {item.image ? (
+                            <Image
+                              src={`${apiUrl}/api${item.image}`}
+                              alt={item.name}
+                              width={50}
+                              height={50}
+                              className="object-cover rounded-md"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-500 text-xs">No Image</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-6 border-b">{item.name}</td>
+                      <td className="py-3 px-6 border-b">Rs. {item.price}</td>
+                      <td className="py-3 px-6 border-b">{item.stock}</td>
+                      <td className="py-3 px-6 border-b">
+                        {item.category === 'best' ? (
+                          <span className="text-green-500">✓</span>
+                        ) : (
+                          <span className="text-red-500">✗</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-6 border-b">
+                        {item.category === 'featured' ? (
+                          <span className="text-green-500">✓</span>
+                        ) : (
+                          <span className="text-red-500">✗</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-6 border-b">
+                        {/* <button className="bg-slate-800 text-white px-4 py-2 rounded-md hover:text-blue-700 mr-2">
+                          Edit
+                        </button> */}
+                        <button
+                          className="bg-slate-800 text-white px-4 py-2 rounded-md hover:text-green-700"
+                          onClick={() => DeleteProduct(item.productid)}
+                        >
+                          <Trash/>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       )}
