@@ -233,6 +233,19 @@ export default function ProductForm() {
         </div>
       ) : (
         <div className="h-full flex flex-col">
+          {productData.length > 0 && (
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold">Products</h2>
+              <button
+                onClick={() => setToggleForm(true)}
+                className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded hover:bg-slate-950"
+              >
+                <Plus size={18} />
+                Create Product
+              </button>
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto">
             {productData.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-4">
@@ -297,14 +310,11 @@ export default function ProductForm() {
                         )}
                       </td>
                       <td className="py-3 px-6 border-b">
-                        {/* <button className="bg-slate-800 text-white px-4 py-2 rounded-md hover:text-blue-700 mr-2">
-                          Edit
-                        </button> */}
                         <button
-                          className="bg-slate-800 text-white px-4 py-2 rounded-md hover:text-green-700"
+                          className="bg-slate-800 text-white p-2 rounded-md hover:text-red-700"
                           onClick={() => DeleteProduct(item.productid)}
                         >
-                          <Trash/>
+                          <Trash size={18} />
                         </button>
                       </td>
                     </tr>

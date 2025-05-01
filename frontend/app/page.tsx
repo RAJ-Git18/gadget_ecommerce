@@ -2,12 +2,13 @@
 
 import Image from 'next/image';
 import CarouselBestProducts from '@/components/CarouselBestProducts';
+import { CarouselFeaturedProducts } from '@/components/CarouselFeaturedProducts';
 
 export default function HomePage() {
 
   const scrollToPosition = () => {
     window.scrollTo({
-      top: 700,        // pixels from the top
+      top: 60,        // pixels from the top
       behavior: 'smooth',
     });
   };
@@ -35,6 +36,12 @@ export default function HomePage() {
         <h2 className="text-center text-3xl font-bold mb-6">Best Selling Products</h2>
         <div className="max-w-6xl mx-auto px-4">
           <CarouselBestProducts />
+        </div>
+
+
+        <h2 className="text-center text-3xl font-bold mb-6 border-t p-4">Featured Products</h2>
+        <div className="max-w-6xl mx-auto px-4">
+          <CarouselFeaturedProducts />
         </div>
       </div>
 
