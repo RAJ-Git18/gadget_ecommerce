@@ -73,18 +73,60 @@ export default function RootLayout({
     return (
         <div className="flex min-h-screen">
             {/* Sidebar */}
-            <div className="w-[15%] bg-gray-800 text-white p-4 fixed h-screen mt-14">
-                <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
-                <ul className="space-y-4">
-                    <Link href='/adminsite/dashboard'><li className="hover:text-gray-300 cursor-pointer">Dashboard</li>
-                    </Link>
-                    <Link href='/adminsite/product'><li className="hover:text-gray-300 cursor-pointer">Products</li>
-                    </Link>
-                    <Link href='/adminsite/users'><li className="hover:text-gray-300 cursor-pointer">Users</li>
-                    </Link>
-                </ul>
-            </div>
+            <div className="fixed left-0 top-16 h-screen w-64 bg-gray-800 text-white shadow-lg z-50">
+                {/* Sidebar Header */}
+                <div className="p-5 border-b border-gray-700">
+                    <h1 className="text-2xl font-bold">
+                        <span className="text-blue-400">Bits</span>
+                        <span className="text-cyan-300">&</span>
+                        <span className="text-blue-400">Bytes</span>
+                    </h1>
+                    <p className="text-gray-400 text-sm mt-1">Admin Panel</p>
+                </div>
 
+                {/* Navigation Menu */}
+                <nav className="p-4">
+                    <ul className="space-y-2">
+                        <li>
+                            <Link
+                                href="/adminsite/dashboard"
+                                className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                <span className="mr-3">📊</span>
+                                Dashboard
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link
+                                href="/adminsite/product"
+                                className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                <span className="mr-3">💻</span>
+                                Products
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link
+                                href="/adminsite/users"
+                                className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                <span className="mr-3">👥</span>
+                                Users
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
+
+                {/* Mobile Toggle Button (only shows on small screens) */}
+                <button
+                    className="md:hidden absolute -right-12 top-4 p-2 bg-gray-800 rounded-r-lg"
+                    onClick={() => {/* Add toggle function here */ }}
+                >
+                    ≡
+                </button>
+            </div>
             {/* Main Content */}
             {children}
         </div>

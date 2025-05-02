@@ -2,12 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import get_user_model
+from accounts.models import CustomUserModel
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
-
-User = get_user_model()
 
 
 class LoginView(APIView):
@@ -26,6 +23,7 @@ class LoginView(APIView):
                     "access": str(access),
                     "is_admin": user.is_superuser,
                     "status": "Logged In",
+                    'userid': user.pk
                 }
             )
 

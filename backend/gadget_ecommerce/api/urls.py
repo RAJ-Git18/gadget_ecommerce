@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from login.views import LoginView, ProtectedView
 from accounts.views import RegisterView
 from product.views import ProductView
+from cart.views import CartView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -18,7 +19,11 @@ urlpatterns = [
     path("protected/", ProtectedView.as_view()),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("getproducts/", ProductView.as_view(), name="produts"),
-    path("deleteproduct/<uuid:productid>/", ProductView.as_view(), name="delete_product"),
+    path("addtocart/", CartView.as_view(), name="addtocart"),
+    path("getcartitems/<uuid:userid>/", CartView.as_view(), name="getcartitems"),
+    path(
+        "deleteproduct/<uuid:productid>/", ProductView.as_view(), name="delete_product"
+    ),
 ]
 
 

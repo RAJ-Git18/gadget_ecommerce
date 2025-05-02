@@ -66,6 +66,32 @@ export const CarouselFeaturedProducts = () => {
         );
     }
 
+    const AddToCart = async (productid: string) => {
+        setisLoading(true)
+
+        if (localStorage.getItem('isadmin') === 'admin') {
+            alert('Admin cannot add products to cart.')
+            return
+        }
+
+        try {
+            const response = await axios.post(`${apiUrl}/api/addtocart/`, {
+                userid: localStorage.getItem('userid'),
+                productid: productid
+            })
+
+            if (response.status === 201) {
+                // alert('Product added to cart successfully!')
+                
+            }
+        } catch (error: any) {
+            console.log(error)
+            window.location.reload()
+        } finally {
+            setisLoading(false)
+        }
+    }
+
     return (
         <div className="w-full mx-auto py-10">
             <Carousel className="w-full">
@@ -91,10 +117,16 @@ export const CarouselFeaturedProducts = () => {
                             </div>
                             <div className="border-t border-gray-300 mx-4 my-2"></div>
                             <div className="flex justify-between items-center px-4 pb-4">
-                                <div className="text-gray-700 font-semibold">Price: Rs. {item.price}</div>
+                                <div className="text-gray-700 font-semibold">₹ {item.price}</div>
                                 <div className="flex gap-2">
                                     <Heart className="text-gray-600 cursor-pointer hover:text-red-500" />
-                                    <ShoppingCart className="text-gray-600 cursor-pointer hover:text-green-500" />
+                                    <button
+                                        type="button"
+                                        onClick={() => AddToCart(item.productid)}
+                                    >
+                                        <ShoppingCart />
+                                    </button>
+
                                 </div>
                             </div>
                         </CarouselItem>

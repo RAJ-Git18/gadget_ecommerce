@@ -3,18 +3,19 @@
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 py-10 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
 
         {/* Logo and Description */}
-        <div className="mb-8 md:mb-0">
+        <div className="md:max-w-sm">
           <h1 className="text-2xl font-bold text-white mb-2">Bits&Bytes</h1>
-          <p className="max-w-xs text-gray-400">
+          <p className="text-gray-400">
             Your ultimate destination for the latest gadgets and tech essentials.
           </p>
         </div>
 
         {/* Links */}
-        <div className="flex flex-wrap gap-10">
+        <div className="flex flex-col sm:flex-row gap-10 flex-wrap md:justify-end">
+
           {/* Shop */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Shop</h3>
@@ -47,6 +48,7 @@ export default function Footer() {
               <li className="hover:text-white cursor-pointer">Returns</li>
             </ul>
           </div>
+
         </div>
       </div>
 

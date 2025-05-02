@@ -10,18 +10,17 @@ export default function LayoutWrapper({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-
     const pathname = usePathname()
     const isAdmin = pathname.startsWith('/adminsite')
 
     return (
         <html lang="en">
-            <body>
+            <body className="min-h-screen flex flex-col">
                 <Navbar />
-                {children}
-                {
-                    !isAdmin && <Footer/> 
-                }
+                <main className="flex-grow">
+                    {children}
+                </main>
+                {!isAdmin && <Footer />}
             </body>
         </html>
     );

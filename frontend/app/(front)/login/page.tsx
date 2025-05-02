@@ -54,16 +54,20 @@ export default function LoginPage() {
             localStorage.setItem('access', response.data.access)
             localStorage.setItem('refresh', response.data.refresh)
             localStorage.setItem('status', response.data.status)
+            localStorage.setItem('userid', response.data.userid)
+            localStorage.setItem('userid', response.data.userid)
 
             if (response.data.message === 'Login successful') {
 
                 setLoggedIn(true)
 
                 if (response.data.is_admin) {
+                    localStorage.setItem('isadmin', 'admin')
                     window.location.href = '/adminsite/dashboard'
 
+
                 } else {
-                    router.replace('/')
+                    localStorage.setItem('isadmin', 'user')
                     window.location.href = '/'
                 }
 
