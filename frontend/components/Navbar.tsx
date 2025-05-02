@@ -26,9 +26,9 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="bg-white/80 shadow-md px-6 md:px-20 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b border-gray-200">
+        <nav className="bg-[#FEFEFE] shadow-md px-6 md:px-20 py-2  flex items-center justify-between fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b border-gray-200">
             <Link href="/" className="text-xl font-bold text-gray-800">
-            <Image src='/images/logo.png' height={100} width={100} alt='Logo'   />
+            <Image src='/images/logo.png' height={200} width={200} alt='Logo' />
             </Link>
 
             {/* Mobile menu button */}
@@ -66,14 +66,14 @@ export default function Navbar() {
                 </button>
                 {!isloggedin ? (
                     <button
-                        className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="bg-[#1050B2] text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                         onClick={() => router.push('/login')}
                     >
                         Login
                     </button>
                 ) : (
                     <button
-                        className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                            className="bg-[#1050B2] text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                         onClick={handleLogout}
                     >
                         Logout
