@@ -25,3 +25,6 @@ class CartSerializer(serializers.ModelSerializer):
             return cart
 
         return CartModel.objects.create(**validated_data)
+    
+
+

@@ -3,14 +3,20 @@
 import Image from 'next/image'
 import CarouselBestProducts from '@/components/CarouselBestProducts'
 import { CarouselFeaturedProducts } from '@/components/CarouselFeaturedProducts'
+import { useEffect } from 'react';
 
 export default function HomePage() {
   const scrollToPosition = () => {
     window.scrollTo({
-      top: 60,
+      top: 620,
       behavior: 'smooth',
     });
   };
+
+  useEffect(() => {
+    scrollToPosition()
+  }, [])
+  
 
   return (
     <div className="w-full flex flex-col items-center mt-24">

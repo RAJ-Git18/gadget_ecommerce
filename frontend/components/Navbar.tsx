@@ -22,13 +22,14 @@ export default function Navbar() {
         localStorage.removeItem('refresh')
         localStorage.removeItem('status')
         localStorage.removeItem('userid')
+        localStorage.removeItem('isadmin')
         router.push('/')
     }
 
     return (
         <nav className="bg-[#FEFEFE] shadow-md px-6 md:px-20 py-2  flex items-center justify-between fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b border-gray-200">
             <Link href="/" className="text-xl font-bold text-gray-800">
-            <Image src='/images/logo.png' height={200} width={200} alt='Logo' />
+                <Image src='/images/logo.png' height={200} width={200} alt='Logo' />
             </Link>
 
             {/* Mobile menu button */}
@@ -66,14 +67,14 @@ export default function Navbar() {
                 </button>
                 {!isloggedin ? (
                     <button
-                        className="bg-[#1050B2] text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="bg-[#1050B2] font-semibold text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                         onClick={() => router.push('/login')}
                     >
                         Login
                     </button>
                 ) : (
                     <button
-                            className="bg-[#1050B2] text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="bg-[#1050B2] font-semibold text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                         onClick={handleLogout}
                     >
                         Logout
@@ -104,7 +105,7 @@ export default function Navbar() {
                             }}
                             className="p-3 rounded-full hover:bg-gray-100"  // Increased padding from p-2 to p-3
                         >
-                            <ShoppingCart size={24} />  
+                            <ShoppingCart size={24} />
                         </button>
                         {!isloggedin ? (
                             <button

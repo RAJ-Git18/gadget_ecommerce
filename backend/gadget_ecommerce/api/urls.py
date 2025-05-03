@@ -7,6 +7,7 @@ from login.views import LoginView, ProtectedView
 from accounts.views import RegisterView
 from product.views import ProductView
 from cart.views import CartView
+from orders.views import OrderView, OrderItemView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -20,10 +21,13 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("getproducts/", ProductView.as_view(), name="produts"),
     path("addtocart/", CartView.as_view(), name="addtocart"),
+    path("deletecart/<uuid:cartid>/", CartView.as_view(), name="deletecart"),
+    path("makeorder/", OrderView.as_view(), name="makeorder"),
     path("getcartitems/<uuid:userid>/", CartView.as_view(), name="getcartitems"),
     path(
         "deleteproduct/<uuid:productid>/", ProductView.as_view(), name="delete_product"
     ),
+    path("getcutomerorder/", OrderItemView.as_view(), name="delete_product"),
 ]
 
 

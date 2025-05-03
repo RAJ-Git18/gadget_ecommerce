@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Trash, X } from 'lucide-react';
 import Loader from '@/components/Loader';
+import { useRouter } from 'next/navigation';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,6 +29,9 @@ interface CartDetailInterface {
 }
 
 const CartPage = () => {
+
+  const router = useRouter()
+
   const [cartItems, setCartItems] = useState<CartDetailInterface[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showBill, setshowBill] = useState(false)
@@ -46,6 +50,7 @@ const CartPage = () => {
         const response = await axios.get(`${apiUrl}/api/getcartitems/${userid}/`);
         if (response.status === 200) {
           setCartItems(response.data);
+          console.log(response.data);
         }
       } catch (error) {
         console.error('Error fetching cart:', error);
@@ -57,6 +62,96 @@ const CartPage = () => {
     getCartItems();
   }, []);
 
+
+
+  const handleIncrease = (productid: string) => {
+    const updatequantity = cartItems.map((item) => (
+      item.productid === productid ?
+        {
+          ...item, quantity: item.quantity + 1
+        }
+        :
+        item
+    ))
+
+    setCartItems(updatequantity)
+  }
+  const handleDecrease = (productid: string) => {
+    const updatequantity = cartItems.map((item) => (
+      item.productid === productid ?
+        {
+          ...item, quantity: item.quantity - 1
+        }
+        :
+        item
+    ))
+
+    setCartItems(updatequantity)
+
+  }
+
+  const handleDelete = async (cartid: string) => {
+    setIsLoading(true)
+    try {
+      const response = await axios.delete(`${apiUrl}/api/deletecart/${cartid}/`)
+    } catch (error: any) {
+      alert('Cart cannot be deleted')
+    } finally {
+      setIsLoading(false)
+      window.location.reload()
+    }
+  }
+
+
+
+  const proceedOrder = async () => {
+    setIsLoading(true)
+    try {
+      const orderPayload = {
+        userid: localStorage.getItem('userid'),
+        items: cartItems.map((item) => (
+          {
+            productid: item.productid,
+            quantity: item.quantity,
+            price: item.product.price,
+          }
+        )),
+        totalamount: parseFloat((cartItems.reduce((sum, item) => (sum + item.quantity * item.product.price), 0)).toString()).toFixed(2)
+
+      }
+      const response = await axios.post(`${apiUrl}/api/makeorder/`, orderPayload,
+        {
+          headers: {
+            "Content-Type": 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('access')}`
+          }
+        }
+      )
+      if (response.status === 201) {
+        alert('Added to the cart')
+      }
+    } catch (error: any) {
+      alert('Process cannot be completed')
+      console.error(error)
+      try {
+        const response = await axios.post(`${apiUrl}/api/token/refresh/`, {
+          refresh: localStorage.getItem('refresh')
+        });
+
+        localStorage.setItem('access', response.data.access);
+        router.push('/');
+      } catch (e) {
+        console.error('Refresh token invalid:', e);
+        router.push('/login');
+      }
+    } finally {
+      setIsLoading(false)
+      // window.location.reload()
+      return
+    }
+  }
+
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center ">
@@ -64,13 +159,6 @@ const CartPage = () => {
       </div>
     );
   }
-
-
-
-  const totalamount = cartItems.reduce((sum: number, item) => (
-    sum + item.quantity * item.product.price
-
-  ), 0)
 
 
   if (showBill) {
@@ -86,7 +174,7 @@ const CartPage = () => {
           {
             cartItems.map((item) => (
               <ul key={item.cartid} className='flex justify-between gap-10 p-3'>
-                <li>{item.product.name}</li>
+                <li>{item.product.name} ({item.quantity})</li>
                 <li>₹ {parseFloat((item.product.price).toString()).toFixed(2)}</li>
               </ul>
             ))
@@ -95,11 +183,20 @@ const CartPage = () => {
         <div className="flex justify-between border-t p-3 ">
           <div className="">Total amount</div>
           <div className="">
-            ₹ {parseFloat(totalamount.toString()).toFixed(2)}
+            {/* ₹ {parseFloat(totalamount.toString()).toFixed(2)} */}
+
+            ₹ {
+              parseFloat((cartItems.reduce((sum: number, item) => (
+                (sum + item.quantity * item.product.price)
+              ), 0)).toString()).toFixed(2)
+            }
+
           </div>
         </div>
         <div className="flex justify-center py-3">
-          <button className='bg-[#1050B2] hover:bg-blue-700 p-3 px-5 rounded-lg text-white font-semibold'>
+          <button
+            onClick={proceedOrder}
+            className='bg-[#1050B2] hover:bg-blue-700 p-3 px-5 rounded-lg text-white font-semibold'>
             Proceed
           </button>
         </div>
@@ -116,72 +213,84 @@ const CartPage = () => {
       </h1>
 
       <div className="space-y-6">
-        {cartItems.length !== 0 ?
-          cartItems.map((item) => (
-            <div
-              key={item.cartid}
-              className="flex flex-col md:flex-row items-center justify-between gap-4 p-2 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-800 hover:shadow-md transition mx-20"
-            >
-              <div className="w-full md:w-24 h-24 flex-shrink-0">
-                {item.product.image ? (
-                  <Image
-                    src={`${apiUrl}/api${item.product.image}`}
-                    alt={item.product.name}
-                    width={100}
-                    height={100}
-                    className="object-cover rounded"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center rounded">
-                    <span className="text-sm text-gray-600">No Image</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{item.product.name}</h2>
-                <p className="text-sm text-gray-500">₹ {item.product.price}</p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border rounded overflow-hidden bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
-                  <button className="px-3 py-1 text-lg hover:bg-gray-200 dark:hover:bg-gray-600">-</button>
-                  <span className="px-4">{item.quantity}</span>
-                  <button className="px-3 py-1 text-lg hover:bg-gray-200 dark:hover:bg-gray-600">+</button>
+        {cartItems.length !== 0 ? (
+          <div className="">
+            {cartItems.map((item) => (
+              <div
+                key={item.cartid}
+                className="flex flex-col md:flex-row items-center justify-between mb-4 p-2 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-800 hover:shadow-md transition mx-20"
+              >
+                <div className="w-full md:w-24 h-24 flex-shrink-0">
+                  {item.product.image ? (
+                    <Image
+                      src={`${apiUrl}/api${item.product.image}`}
+                      alt={item.product.name}
+                      width={100}
+                      height={100}
+                      className="object-cover rounded"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center rounded">
+                      <span className="text-sm text-gray-600">No Image</span>
+                    </div>
+                  )}
                 </div>
 
-                <button className="hover:text-gray-700 dark:hover:text-gray-400 transition">
-                  <Trash />
-                </button>
-              </div>
-            </div>
-          ))
-          :
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{item.product.name}</h2>
+                  <p className="text-sm text-gray-500">₹ {item.product.price}</p>
+                </div>
 
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center border rounded overflow-hidden bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                    <button
+                      onClick={() => handleDecrease(item.productid)}
+                      disabled={item.quantity <= 1}  // Disable when quantity is 1 or less
+                      className={`px-3 py-1 text-lg ${item.quantity <= 1
+                        ? 'text-gray-400 cursor-not-allowed'  // Styles when disabled
+                        : 'hover:bg-gray-200 dark:hover:bg-gray-600'  // Normal hover styles
+                        }`}
+                    >
+                      -
+                    </button>
+                    <span className="px-4">{item.quantity}</span>
+                    <button
+                      onClick={() => handleIncrease(item.productid)}
+                      className="px-3 py-1 text-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button onClick={() => handleDelete(item.cartid)} className="hover:text-gray-700 dark:hover:text-gray-400 transition">
+                    <Trash />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <div className="absolute bottom-10 right-10">
+              <button
+                className='bg-[#1050B2] hover:bg-blue-700 p-3 px-5 rounded-lg text-white font-semibold'
+                onClick={() => setshowBill(true)}
+              >
+                Make Bill
+              </button>
+            </div>
+          </div>
+        ) : (
           <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white px-6 text-center">
             <h2 className="text-4xl font-bold mb-4">No items in your cart 😕</h2>
             <p className="text-lg mb-6">Looks like you haven't added anything yet.</p>
-            <Link href="/shop">
+            <Link href="/">
               <button className="bg-white text-slate-900 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
                 Go to Shop
               </button>
             </Link>
           </div>
-
-        }
-
+        )}
       </div>
-
-      <div className="absolute bottom-10 right-10 ">
-        <button className='bg-[#1050B2] hover:bg-blue-700 p-3 px-5 rounded-lg text-white font-semibold'
-          onClick={() => setshowBill(true)}
-        >
-          Make Bill
-        </button>
-
-      </div>
-
     </div>
   );
 };

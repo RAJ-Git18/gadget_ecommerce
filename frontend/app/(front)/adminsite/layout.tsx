@@ -73,7 +73,7 @@ export default function RootLayout({
     return (
         <div className="flex min-h-screen">
             {/* Sidebar */}
-            <div className="fixed left-0 top-16 h-screen w-64 bg-gray-800 text-white shadow-lg z-50">
+            <div className="fixed left-0 top-20 h-screen w-64 bg-gray-800 text-white shadow-lg z-50">
                 {/* Sidebar Header */}
                 <div className="p-5 border-b border-gray-700">
                     <h1 className="text-2xl font-bold">
@@ -109,11 +109,11 @@ export default function RootLayout({
 
                         <li>
                             <Link
-                                href="/adminsite/users"
+                                href="/adminsite/orders"
                                 className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors"
                             >
-                                <span className="mr-3">👥</span>
-                                Users
+                                <span className="mr-3">📦</span> {/* Package icon for orders */}
+                                Orders
                             </Link>
                         </li>
                     </ul>

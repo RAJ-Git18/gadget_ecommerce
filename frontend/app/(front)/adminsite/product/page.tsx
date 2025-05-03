@@ -129,7 +129,7 @@ export default function ProductForm() {
       }
     } catch (error: any) {
       alert('Product cannot be deleted');
-    } 
+    }
   };
 
   if (isLoading) {
