@@ -27,7 +27,7 @@ urlpatterns = [
     path(
         "deleteproduct/<uuid:productid>/", ProductView.as_view(), name="delete_product"
     ),
-    path("getcutomerorder/", OrderItemView.as_view(), name="delete_product"),
+    path("getcutomerorder/", OrderItemView.as_view(), name="getcustomerorder"),
 ]
 
 
