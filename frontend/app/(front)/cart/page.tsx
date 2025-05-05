@@ -7,6 +7,10 @@ import Link from 'next/link';
 import { Trash, X, Check, ArrowLeft, CreditCard } from 'lucide-react';
 import Loader from '@/components/Loader';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/reduxtoolkit/store';
+import { useDispatch } from 'react-redux';
+import { cartDecrement, cartDecrementByAmount, cartIncrement, cartReset } from '@/app/reduxtoolkit/cart/cartSlice';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -29,6 +33,8 @@ interface CartDetailInterface {
 }
 
 const CartPage = () => {
+  const cartCount = useSelector((state: RootState) => state.cart.cartCount)
+  const dispatch = useDispatch()
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartDetailInterface[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +69,7 @@ const CartPage = () => {
   }, []);
 
   const handleIncrease = (productid: string) => {
+    dispatch(cartIncrement())
     const updatequantity = cartItems.map((item) => (
       item.productid === productid ?
         { ...item, quantity: item.quantity + 1 }
@@ -72,6 +79,7 @@ const CartPage = () => {
   };
 
   const handleDecrease = (productid: string) => {
+    dispatch(cartDecrement())
     const updatequantity = cartItems.map((item) => (
       item.productid === productid && item.quantity > 1 ?
         { ...item, quantity: item.quantity - 1 }
@@ -80,10 +88,11 @@ const CartPage = () => {
     setCartItems(updatequantity);
   };
 
-  const handleDelete = async (cartid: string) => {
+  const handleDelete = async (cartid: string, quantity: number) => {
     setIsLoading(true);
     try {
       await axios.delete(`${apiUrl}/api/deletecart/${cartid}/`);
+      dispatch(cartDecrementByAmount(quantity))
       setCartItems(cartItems.filter(item => item.cartid !== cartid));
     } catch (error: any) {
       alert('Cart cannot be deleted');
@@ -146,7 +155,7 @@ const CartPage = () => {
 
   const handlePaymentSuccess = () => {
     setPaymentStep('success');
-    // Clear cart after successful payment
+    dispatch(cartReset(0))
     setTimeout(() => {
       setCartItems([]);
       setShowBill(false);
@@ -259,7 +268,7 @@ const CartPage = () => {
                     >
                       <div className="flex items-center gap-3">
                         <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
-                          <Image src="/images/qr-icon.png" width={24} height={24} alt="QR Icon" />
+                          <Image src="/images/qr.png" width={24} height={24} alt="QR Icon" />
                         </div>
                         <span className="font-medium dark:text-gray-200">QR Code Payment</span>
                       </div>
@@ -423,8 +432,8 @@ const CartPage = () => {
                         onClick={() => handleDecrease(item.productid)}
                         disabled={item.quantity <= 1}
                         className={`px-3 py-1 text-lg ${item.quantity <= 1
-                            ? 'text-gray-400 cursor-not-allowed dark:text-gray-500'
-                            : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                          ? 'text-gray-400 cursor-not-allowed dark:text-gray-500'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                           }`}
                       >
                         -
@@ -439,7 +448,7 @@ const CartPage = () => {
                     </div>
 
                     <button
-                      onClick={() => handleDelete(item.cartid)}
+                      onClick={() => handleDelete(item.cartid, item.quantity)}
                       className="text-red-500 hover:text-red-700 dark:hover:text-red-400 transition"
                     >
                       <Trash size={20} />
@@ -461,7 +470,7 @@ const CartPage = () => {
           </>
         ) : (
           <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
-            <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-6">
+            <div className="p-6  mb-6">
               <Image
                 src="/images/empty-cart.png"
                 width={120}

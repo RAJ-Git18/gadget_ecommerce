@@ -5,8 +5,14 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShoppingCart, Menu, X } from 'lucide-react'
 import Image from 'next/image'
+import { useSelector } from 'react-redux'
+import { RootState } from '../app/reduxtoolkit/store';
+import axios from 'axios'
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Navbar() {
+    const cartCount = useSelector((state: RootState) => state.cart.cartCount)
     const router = useRouter()
     const [isloggedin, setisloggedin] = useState(false)
     const [search, setSearch] = useState('')
@@ -16,14 +22,26 @@ export default function Navbar() {
         localStorage.getItem('status') === 'Logged In' && setisloggedin(true)
     }, [])
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setisloggedin(false)
-        localStorage.removeItem('access')
-        localStorage.removeItem('refresh')
-        localStorage.removeItem('status')
-        localStorage.removeItem('userid')
-        localStorage.removeItem('isadmin')
-        router.push('/')
+        try {
+            const response = await axios.patch(`${apiUrl}/api/logout/`, {
+                userid: localStorage.getItem('userid'),
+                cartcount: localStorage.getItem('cartcount')
+            })
+            if (response.status === 200) {
+                localStorage.removeItem('access')
+                localStorage.removeItem('refresh')
+                localStorage.removeItem('status')
+                localStorage.removeItem('userid')
+                localStorage.removeItem('isadmin')
+                localStorage.removeItem('cartcount')
+                router.push('/')
+            }
+        } catch (error: any) {
+            alert('Cannot logout now')
+        }
+
     }
 
     return (
@@ -59,6 +77,18 @@ export default function Navbar() {
 
             {/* Desktop right section */}
             <div className="hidden md:flex items-center gap-5">
+
+                {
+                    cartCount > 0 &&
+                    <button className='bg-red-500 rounded-full px-2 absolute top-3 right-44 text-white'>
+                        {/* {localStorage.getItem('cartcount')} */}
+                        {cartCount}
+
+
+                    </button>
+                }
+
+
                 <button
                     onClick={() => router.push('/cart')}
                     className="p-2 rounded-full hover:bg-gray-100 transition-colors"

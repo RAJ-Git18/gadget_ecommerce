@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/carousel";
 import axios from 'axios';
 import Loader from './Loader';
+import { useDispatch } from 'react-redux';
+import { cartIncrement } from '@/app/reduxtoolkit/cart/cartSlice';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,6 +28,7 @@ interface ProductDataInterface {
 }
 
 export const CarouselFeaturedProducts = () => {
+    const dispatch = useDispatch()
     const [productData, setproductData] = useState<ProductDataInterface[]>([]);
     const [isLoading, setisLoading] = useState(false);
 
@@ -67,7 +70,8 @@ export const CarouselFeaturedProducts = () => {
     }
 
     const AddToCart = async (productid: string) => {
-        setisLoading(true)
+        // setisLoading(true)
+        dispatch(cartIncrement())
 
         if (localStorage.getItem('isadmin') === 'admin') {
             alert('Admin cannot add products to cart.')
@@ -89,6 +93,7 @@ export const CarouselFeaturedProducts = () => {
             window.location.reload()
         } finally {
             setisLoading(false)
+            
         }
     }
 

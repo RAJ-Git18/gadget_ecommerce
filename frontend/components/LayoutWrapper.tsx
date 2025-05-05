@@ -4,6 +4,7 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import Navbar from './Navbar';
 import Footer from './Footer';
+import StoreProvider from '@/app/reduxtoolkit/provider';
 
 export default function LayoutWrapper({
     children,
@@ -16,11 +17,13 @@ export default function LayoutWrapper({
     return (
         <html lang="en">
             <body className="min-h-screen flex flex-col">
-                <Navbar />
-                <main className="flex-grow">
-                    {children}
-                </main>
-                {!isAdmin && <Footer />}
+                <StoreProvider>
+                    <Navbar />
+                    <main className="flex-grow">
+                        {children}
+                        {!isAdmin && <Footer />}
+                    </main>
+                </StoreProvider>
             </body>
         </html>
     );

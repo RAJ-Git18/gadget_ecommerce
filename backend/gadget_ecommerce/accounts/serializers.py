@@ -5,7 +5,7 @@ from rest_framework import serializers
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserModel
-        fields = ["id", "username", "first_name", "last_name", "email", "password"]
+        fields = ["id", "username", "first_name", "last_name", "email", "password", "cartcount","phonenumber"]
 
         def validate(self, data):
             db_username = CustomUserModel.objects.filter(username=data["username"]).exists()

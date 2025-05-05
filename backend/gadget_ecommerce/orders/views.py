@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import OrderSerializer, OrderItemSerializer
-from .models import OrderItemModel
+from .models import OrderItemModel, OrderModel
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -62,6 +62,17 @@ class OrderView(APIView):
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+
+
+class AdminStatusView(APIView):
+    def patch(self, request):
+        orderid = request.data.get("orderid")
+        status = request.data.get("status")
+        order = OrderModel.objects.filter(orderid=orderid).first()
+        deserializer = OrderSerializer(order, data=request.data, partial=True)
+        if deserializer.is_valid():
+            deserializer.save()
+            return Response(deserializer.data)
 
 class OrderItemView(APIView):
     def get(self, request):

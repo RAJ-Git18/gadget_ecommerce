@@ -47,6 +47,7 @@ export default function ProductForm() {
         const response = await axios.get(`${apiUrl}/api/getproducts/`);
         if (response.status === 200) {
           setproductData(response.data.message);
+          console.log(response.data.message);
         }
       } catch (error: any) {
         alert('Please try again.');
@@ -230,7 +231,7 @@ export default function ProductForm() {
           </form>
         </div>
       ) : (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col m-10">
           {productData.length > 0 && (
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold">Products</h2>
@@ -258,7 +259,7 @@ export default function ProductForm() {
               </div>
             ) : (
               <table className="min-w-full bg-white border border-gray-200">
-                <thead className="sticky top-0 bg-gray-100 z-10">
+                <thead className="bg-gray-100">
                   <tr>
                     <th className="py-3 px-6 border-b">Image</th>
                     <th className="py-3 px-6 border-b">Name</th>

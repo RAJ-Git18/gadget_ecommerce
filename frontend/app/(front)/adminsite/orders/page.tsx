@@ -16,6 +16,7 @@ interface OrderInterface {
   product: { name: string, image: string },
   quantity: number,
   price: string,
+  phonenumber: string,
 }
 
 const Page = () => {
@@ -42,16 +43,36 @@ const Page = () => {
 
   const statusOptions = ['pending', 'completed', 'cancelled']
 
-  const handleStatusChange = (index: number, newStatus: string) => {
+  const handleStatusChange = async (index: number, newStatus: string, orderid: string) => {
+    setIsLoading(true)
     const updatedOrders = [...orderItems]
     updatedOrders[index].order.status = newStatus
     setOrderItems(updatedOrders)
-    // Optionally: send update to backend
+    try {
+      const response = await axios.patch(`${apiUrl}/api/updatestatus/`,
+        {
+          orderid: orderid,
+          status: newStatus
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      if (response.status === 200) {
+        console.log(response.data)
+      }
+    } catch (error: any) {
+      alert('Please try again')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen bg-red-500">
         <Loader />
       </div>
     )
@@ -85,7 +106,6 @@ const Page = () => {
                       <span className="text-gray-500 text-xs">No Image</span>
                     </div>
                   )}
-                  <p className="text-sm font-medium">Qty: {item.quantity}</p>
                 </div>
 
                 {/* Middle: Name, Order ID, User ID */}
@@ -93,19 +113,20 @@ const Page = () => {
                   <h3 className="text-lg font-semibold">{item.product.name}</h3>
                   <p className="text-sm text-gray-600">Order ID: {item.order.orderid}</p>
                   <p className="text-sm text-gray-600">User ID: {item.order.userid}</p>
+                  <p className="text-sm text-gray-600">Phone number: {item.phonenumber}</p>
                 </div>
 
                 {/* Right: Price, Qty, Total, Status */}
                 <div className="flex flex-col gap-1 text-sm text-right">
-                  <p><span className="font-medium">Price:</span> ₹{item.price}</p>
+                  <p><span className="font-medium">Price:</span> ₹ {item.price}</p>
                   <p><span className="font-medium">Quantity:</span> {item.quantity}</p>
-                  <p><span className="font-medium">Total:</span> ₹{totalPrice}</p>
+                  <p><span className="font-medium">Total:</span> ₹ {totalPrice}</p>
 
                   <div className="mt-1 flex items-center gap-3">
                     <label className="font-medium block mb-1">Status:</label>
                     <select
                       value={item.order.status}
-                      onChange={(e) => handleStatusChange(index, e.target.value)}
+                      onChange={(e) => handleStatusChange(index, e.target.value, item.order.orderid)}
                       className="border rounded px-3 py-1 text-sm"
                     >
                       {statusOptions.map((status) => (
