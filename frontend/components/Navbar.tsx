@@ -62,7 +62,7 @@ export default function Navbar() {
                 <div className="flex space-x-6 font-semibold">
                     <Link href="/" className="text-gray-900 hover:text-slate-700 transition-colors">Home</Link>
                     <Link href="/about" className="text-gray-900 hover:text-slate-700 transition-colors">About</Link>
-                    <Link href="/shop" className="text-gray-900 hover:text-slate-700 transition-colors">Shop</Link>
+                    <Link href="/contact" className="text-gray-900 hover:text-slate-700 transition-colors">Contact</Link>
                 </div>
                 <div className="w-full max-w-md">
                     <input

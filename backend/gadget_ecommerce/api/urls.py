@@ -8,6 +8,7 @@ from accounts.views import RegisterView
 from product.views import ProductView
 from cart.views import CartView
 from orders.views import OrderView, OrderItemView, AdminStatusView
+from contact.views import ContactView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -30,6 +31,13 @@ urlpatterns = [
     ),
     path("getcutomerorder/", OrderItemView.as_view(), name="getcustomerorder"),
     path("updatestatus/", AdminStatusView.as_view(), name="updatestatus"),
+    path("contactus/", ContactView.as_view(), name="contact-us"),
+    path("getinquiries/", ContactView.as_view(), name="get-inquiries"),
+    path(
+        "deleteinquiries/<uuid:contactid>/",
+        ContactView.as_view(),
+        name="delete-inquiries",
+    ),
 ]
 
 

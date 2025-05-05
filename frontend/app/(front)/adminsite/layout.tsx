@@ -116,6 +116,16 @@ export default function RootLayout({
                                 Orders
                             </Link>
                         </li>
+
+                        <li>
+                            <Link
+                                href="/adminsite/inquiry"
+                                className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                <span className="mr-3">📦</span> {/* Package icon for orders */}
+                                Inquiries
+                            </Link>
+                        </li>
                     </ul>
                 </nav>
 
