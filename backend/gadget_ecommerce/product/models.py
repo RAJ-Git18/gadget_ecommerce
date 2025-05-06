@@ -9,6 +9,7 @@ class ProductModel(models.Model):
     image = models.ImageField(upload_to="images/")
     price = models.PositiveIntegerField()
     stock = models.PositiveIntegerField()
+    displayas = models.CharField(max_length=100, null=True)
     category = models.CharField(max_length=100)
     description = models.TextField()
 

@@ -12,7 +12,8 @@ interface FormDataInterface {
   name: string;
   price: string;
   stock: string;
-  category: 'featured' | 'best';
+  displayas: 'featured' | 'best';
+  category: 'mobile' | 'tv' | 'laptop' | 'watch';
   details: string;
   image: File | null;
 }
@@ -22,45 +23,48 @@ interface ProductDataInterface {
   name: string;
   price: string;
   stock: string;
-  category: 'featured' | 'best';
+  displayas: 'featured' | 'best';
+  category: 'mobile' | 'tv' | 'laptop' | 'watch';
   details: string;
   image: string | null;
 }
 
 export default function ProductForm() {
-  const [productData, setproductData] = useState<ProductDataInterface[]>([]);
+  const [productData, setProductData] = useState<ProductDataInterface[]>([]);
   const [formData, setFormData] = useState<FormDataInterface>({
     name: '',
     price: '',
     stock: '',
-    category: 'featured',
+    displayas: 'featured',
+    category: 'mobile',
     details: '',
     image: null,
   });
   const [toggleForm, setToggleForm] = useState<boolean>(false);
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const getProduct = async () => {
-      setisLoading(true)
+      setIsLoading(true);
       try {
         const response = await axios.get(`${apiUrl}/api/getproducts/`);
         if (response.status === 200) {
-          setproductData(response.data.message);
-          console.log(response.data.message);
+          setProductData(response.data.message);
         }
       } catch (error: any) {
         alert('Please try again.');
       } finally {
-        setisLoading(false);
+        setIsLoading(false);
       }
     };
     getProduct();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -68,7 +72,7 @@ export default function ProductForm() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         image: e.target.files![0],
       }));
@@ -83,37 +87,37 @@ export default function ProductForm() {
     form.append('stock', formData.stock);
     form.append('category', formData.category);
     form.append('description', formData.details);
+    form.append('displayas', formData.displayas);
     if (formData.image) {
       form.append('image', formData.image);
     }
 
     try {
       const response = await axios.post(`${apiUrl}/api/getproducts/`, form, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       if (response.status === 201) {
-        setisLoading(true);
+        setIsLoading(true);
         try {
           const response2 = await axios.get(`${apiUrl}/api/getproducts/`);
           if (response2.status === 200) {
-            setproductData(response2.data.message);
+            setProductData(response2.data.message);
             setToggleForm(false);
             setFormData({
               name: '',
               price: '',
               stock: '',
-              category: 'featured',
+              displayas: 'featured',
+              category: 'mobile',
               details: '',
               image: null,
             });
           }
-        } catch (error: any) {
+        } catch {
           alert('Please try again.');
         } finally {
-          setisLoading(false);
+          setIsLoading(false);
         }
       }
     } catch (error: any) {
@@ -126,9 +130,9 @@ export default function ProductForm() {
     try {
       const response = await axios.delete(`${apiUrl}/api/deleteproduct/${productid}/`);
       if (response.status === 200) {
-        setproductData(prev => prev.filter(product => product.productid !== productid));
+        setProductData((prev) => prev.filter((product) => product.productid !== productid));
       }
-    } catch (error: any) {
+    } catch {
       alert('Product cannot be deleted');
     }
   };
@@ -154,7 +158,8 @@ export default function ProductForm() {
                   name: '',
                   price: '',
                   stock: '',
-                  category: 'featured',
+                  displayas: 'featured',
+                  category: 'mobile',
                   details: '',
                   image: null,
                 });
@@ -194,8 +199,8 @@ export default function ProductForm() {
               required
             />
             <select
-              name="category"
-              value={formData.category}
+              name="displayas"
+              value={formData.displayas}
               onChange={handleChange}
               className="w-full border border-gray-300 p-2 rounded"
               required
@@ -203,13 +208,24 @@ export default function ProductForm() {
               <option value="featured">Featured</option>
               <option value="best">Best Selling</option>
             </select>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full border border-gray-300 p-2 rounded"
+              required
+            >
+              <option value="mobile">Mobile</option>
+              <option value="laptop">Laptop</option>
+              <option value="tv">TV</option>
+              <option value="watch">Watch</option>
+            </select>
             <textarea
               name="details"
               value={formData.details}
               onChange={handleChange}
               placeholder="Product description"
               className="w-full border border-gray-300 p-2 rounded min-h-[100px]"
-              rows={4}
               required
             />
             <div>
@@ -245,7 +261,7 @@ export default function ProductForm() {
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto mb-32">
             {productData.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <p className="text-gray-500 text-lg">No products available</p>
@@ -267,6 +283,7 @@ export default function ProductForm() {
                     <th className="py-3 px-6 border-b">Stock</th>
                     <th className="py-3 px-6 border-b">Best Selling</th>
                     <th className="py-3 px-6 border-b">Featured</th>
+                    <th className="py-3 px-6 border-b">Category</th>
                     <th className="py-3 px-6 border-b">Action</th>
                   </tr>
                 </thead>
@@ -278,7 +295,7 @@ export default function ProductForm() {
                           {item.image ? (
                             <Image
                               src={`${apiUrl}/api${item.image}`}
-                              alt={item.name}
+                              alt={item.name || 'Product image'}
                               width={50}
                               height={50}
                               className="object-cover rounded-md"
@@ -295,19 +312,20 @@ export default function ProductForm() {
                       <td className="py-3 px-6 border-b">Rs. {item.price}</td>
                       <td className="py-3 px-6 border-b">{item.stock}</td>
                       <td className="py-3 px-6 border-b">
-                        {item.category === 'best' ? (
+                        {item.displayas === 'best' ? (
                           <span className="text-green-500">✓</span>
                         ) : (
                           <span className="text-red-500">✗</span>
                         )}
                       </td>
                       <td className="py-3 px-6 border-b">
-                        {item.category === 'featured' ? (
+                        {item.displayas === 'featured' ? (
                           <span className="text-green-500">✓</span>
                         ) : (
                           <span className="text-red-500">✗</span>
                         )}
                       </td>
+                      <td className="py-3 px-6 border-b">{item.category}</td>
                       <td className="py-3 px-6 border-b">
                         <button
                           className="bg-slate-800 text-white p-2 rounded-md hover:text-red-700"

@@ -12,8 +12,9 @@ class ProductSerializer(serializers.ModelSerializer):
             "name",
             "image",
             "price",
-            "stock",
             "category",
+            "displayas",
+            "stock",
             "description",
         ]
         extra_kwargs = {"image": {"required": False}}

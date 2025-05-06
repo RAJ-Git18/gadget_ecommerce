@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Heart, ShoppingCart } from 'lucide-react';
 import {
@@ -14,54 +14,52 @@ import axios from 'axios';
 import Loader from './Loader';
 import { useDispatch } from 'react-redux';
 import { cartIncrement } from '@/app/reduxtoolkit/cart/cartSlice';
+import { fetchProducts } from '@/app/reduxtoolkit/product/productSlice';
+import { AppDispatch, RootState } from '@/app/reduxtoolkit/store';
+import { useSelector } from 'react-redux';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-interface ProductDataInterface {
-  productid: string;
-  name: string;
-  price: string;
-  stock: string;
-  category: 'featured' | 'best';
-  details: string;
-  image: string | null;
-}
-
 const CarouselBestProducts = () => {
-  const dispatch = useDispatch()
-  const [productData, setproductData] = useState<ProductDataInterface[]>([]);
-  const [isLoading, setisLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { fetchedProducts, error, isLoading } = useSelector((state: RootState) => state.product);
 
-  useEffect(() => {
-    const getProduct = async () => {
-      setisLoading(true)
-      try {
-        const response = await axios.get(`${apiUrl}/api/getproducts/`);
-        if (response.status === 200) {
-          // Filter to only include featured products
-          const featuredProducts = response.data.message.filter(
-            (product: ProductDataInterface) => product.category === 'best'
-          );
-          setproductData(featuredProducts);
-        }
-      } catch (error: any) {
-        alert('Please try again.');
-      } finally {
-        setisLoading(false);
+  React.useEffect(() => {
+    if (!fetchedProducts) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, fetchedProducts]);
+
+  const AddToCart = async (productid: string) => {
+    if (localStorage.getItem('isadmin') === 'admin') {
+      alert('Admin cannot add products to cart.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${apiUrl}/api/addtocart/`, {
+        userid: localStorage.getItem('userid'),
+        productid: productid
+      });
+
+      if (response.status === 201) {
+        dispatch(cartIncrement());
       }
-    };
-    getProduct();
-  }, []);
+    } catch (error) {
+      console.error(error);
+      window.location.reload();
+    }
+  };
 
   if (isLoading) {
     return (
-      <div className=" flex justify-center h-72 items-center">
+      <div className="flex justify-center h-72 items-center">
         <Loader />
       </div>
     );
   }
 
-  if (productData.length === 0) {
+  if (fetchedProducts.length === 0) {
     return (
       <div className="w-full mx-auto py-10 text-center">
         <p className="text-gray-500">No featured products available</p>
@@ -69,74 +67,63 @@ const CarouselBestProducts = () => {
     );
   }
 
-
-
-  const AddToCart = async (productid: string) => {
-    dispatch(cartIncrement())
-    // setisLoading(true)
-    if (localStorage.getItem('isadmin') === 'admin') {
-      alert('Admin cannot add products to cart.')
-      return
-    }
-
-    try {
-      const response = await axios.post(`${apiUrl}/api/addtocart/`, {
-        userid: localStorage.getItem('userid'),
-        productid: productid
-      })
-
-      if (response.status === 201) {
-        // alert('Product added to cart successfully!')
-
-      }
-    } catch (error: any) {
-      console.log(error)
-      window.location.reload()
-    } finally {
-      setisLoading(false)
-      
-    }
-  }
-
-
   return (
-    <div className="w-full mx-auto py-10">
-      <Carousel className="w-full">
-        <CarouselContent>
-          {productData.map((item) => (
-            <CarouselItem key={item.productid} className="md:basis-1/2 lg:basis-1/5 border-2 mx-2">
-              <div className="relative w-full h-64 p-2">
-                {item.image && (
-                  <Image
-                    src={`${apiUrl}/api${item.image}`}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    alt={item.name}
-                    className="rounded-lg"
-                    unoptimized
-                  />
-                )}
-              </div>
-              <div className="border-t border-gray-300 mx-4 my-2"></div>
-              <div className="p-4">
-                <h3 className="font-semibold text-lg">{item.name}</h3>
-                <p className="text-gray-600">{item.details}</p>
-              </div>
-              <div className="border-t border-gray-300 mx-4 my-2"></div>
-              <div className="flex justify-between items-center px-4 pb-4">
-                <div className="text-gray-700 font-semibold"> ₹ {item.price}</div>
-                <div className="flex gap-2">
-                  <Heart className="text-gray-600 cursor-pointer hover:text-red-500" />
-                  <button onClick={() => AddToCart(item.productid)}>
-                  <ShoppingCart className="text-gray-600 cursor-pointer hover:text-green-500" />
-                  </button>
+    <div className="w-full max-w-7xl mx-auto py-10 px-4">
+      <Carousel
+        opts={{
+          align: "start",
+          slidesToScroll: "auto",
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-2">
+          {fetchedProducts
+            .filter((item) => item.displayas === 'best')
+            .map((item) => (
+              <CarouselItem key={item.productid} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
+                <div className="group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100">
+                  {/* Image Container */}
+                  <div className="relative h-64 w-full overflow-hidden">
+                    {item.image && (
+                      <Image
+                        src={`${apiUrl}/api${item.image}`}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        alt={item.name}
+                        className="group-hover:scale-105 transition-transform duration-500"
+                        unoptimized
+                      />
+                    )}
+                    {/* Favorite Button */}
+                    <button className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm">
+                      <Heart className="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" />
+                    </button>
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="p-4 space-y-2">
+                    <h3 className="font-semibold text-lg text-gray-800 truncate">{item.name}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-2">{item.details}</p>
+
+                    {/* Price and Cart */}
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-lg font-bold text-gray-900">₹{item.price}</span>
+                      <button
+                        onClick={() => AddToCart(item.productid)}
+                        className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </CarouselItem>
-          ))}
+              </CarouselItem>
+            ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+
+        {/* Custom Navigation Arrows */}
+        <CarouselPrevious className="-left-10 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white" />
+        <CarouselNext className="-right-10 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white" />
       </Carousel>
     </div>
   );

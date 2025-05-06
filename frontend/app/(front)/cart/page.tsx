@@ -46,7 +46,7 @@ const CartPage = () => {
   useEffect(() => {
     if (localStorage.getItem('isadmin') === 'admin') {
       alert('Admin cannot add products to cart.');
-      return;
+      router.push('/');
     }
 
     const getCartItems = async () => {
