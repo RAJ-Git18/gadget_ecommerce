@@ -47,7 +47,7 @@ export default function RootLayout({
                     });
 
                     localStorage.setItem('access', response.data.access);
-                    router.push('/adminsite/dashboard');
+                    window.location.reload()
                 } catch (e) {
                     console.error('Refresh token invalid:', e);
                     router.push('/login');
@@ -67,7 +67,7 @@ export default function RootLayout({
     }
 
     if (!isAuthorized) {
-        return null; // Don't render anything if not authorized
+        router.push('/login')
     }
 
     return (

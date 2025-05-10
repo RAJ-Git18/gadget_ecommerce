@@ -6,23 +6,27 @@ import { useRouter } from 'next/navigation'
 import { ShoppingCart, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import { useSelector } from 'react-redux'
-import { RootState } from '../app/reduxtoolkit/store';
+import { AppDispatch, RootState } from '../app/reduxtoolkit/store';
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { showLogin } from '@/app/reduxtoolkit/loginStatus/loginSlice'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Navbar() {
     const cartCount = useSelector((state: RootState) => state.cart.cartCount)
     const router = useRouter()
-    const [isloggedin, setisloggedin] = useState(false)
+    // const [isloggedin, setisloggedin] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-    useEffect(() => {
-        localStorage.getItem('status') === 'Logged In' && setisloggedin(true)
-    }, [])
+    const { isloggedIn } = useSelector((state: RootState) => state.login)
+    const dispatch = useDispatch<AppDispatch>()
+
+
 
     const handleLogout = async () => {
-        setisloggedin(false)
+        // setisloggedin(false)
+        dispatch(showLogin())
         try {
             const response = await axios.patch(`${apiUrl}/api/logout/`, {
                 userid: localStorage.getItem('userid'),
@@ -86,7 +90,7 @@ export default function Navbar() {
                 >
                     <ShoppingCart size={32} />
                 </button>
-                {!isloggedin ? (
+                {!isloggedIn ? (
                     <button
                         className="bg-[#1050B2] font-semibold text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                         onClick={() => router.push('/login')}
@@ -122,7 +126,7 @@ export default function Navbar() {
                         >
                             <ShoppingCart size={24} />
                         </button>
-                        {!isloggedin ? (
+                        {!isloggedIn ? (
                             <button
                                 className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
                                 onClick={() => {

@@ -25,7 +25,7 @@ class LoginView(APIView):
                     "refresh": str(refresh),
                     "access": str(access),
                     "is_admin": user.is_superuser,
-                    "status": "Logged In",
+                    # "status": True,
                     "userid": user.pk,
                     "cartcount": myuser.cartcount,
                 }

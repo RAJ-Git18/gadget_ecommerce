@@ -4,18 +4,25 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import Loader from '@/components/Loader'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/reduxtoolkit/store'
+import { useDispatch } from 'react-redux'
+import { showLogout } from '@/app/reduxtoolkit/loginStatus/loginSlice'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 export default function LoginPage() {
     const router = useRouter()
 
+    const dispatch = useDispatch()
+    const {isloggedIn} = useSelector((state:RootState)=>state.login)
+
     const [isLogin, setIsLogin] = useState(true)
 
     const [loginForm, setLoginForm] = useState({ email: '', password: '' })
     const [loginError, setLoginError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-    const [isLoggedIn, setLoggedIn] = useState(false)
+    // const [isLoggedIn, setLoggedIn] = useState(false)
     const [phoneNumber, setPhoneNumber] = useState<string | null>(null)
 
     const [registerForm, setRegisterForm] = useState({
@@ -34,7 +41,7 @@ export default function LoginPage() {
         if (storedPhone) {
             setPhoneNumber(storedPhone)
         }
-    }, [isLoggedIn])
+    }, [isloggedIn])
 
     const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLoginForm({ ...loginForm, [e.target.name]: e.target.value })
@@ -73,7 +80,8 @@ export default function LoginPage() {
             setPhoneNumber(response.data.phonenumber)
 
             if (response.data.message === 'Login successful') {
-                setLoggedIn(true)
+                dispatch(showLogout())
+                // setLoggedIn(true)
                 setLoginForm({ email: '', password: '' }) // ✅ Clear form after success
 
                 if (response.data.is_admin) {
@@ -172,7 +180,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="bg-white shadow-md rounded-b-lg border border-t-0 px-6 py-8">
-                    {isLoggedIn && phoneNumber && (
+                    {isloggedIn && phoneNumber && (
                         <p className="text-green-600 text-center mb-4">
                             Logged in phone number: {phoneNumber}
                         </p>

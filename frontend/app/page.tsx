@@ -15,6 +15,7 @@ export default function HomePage() {
 
   useEffect(() => {
     scrollToPosition()
+    console.log('ia m here')
   }, [])
   
 
