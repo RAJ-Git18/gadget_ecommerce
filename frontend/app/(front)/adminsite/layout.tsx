@@ -33,9 +33,7 @@ export default function RootLayout({
                     headers: { Authorization: `Bearer ${access_token}` }
                 });
 
-                if (response.data.message) {
-                    setIsAuthorized(true);
-                } else {
+                if (!response.data.message) {
                     router.push('/');
                 }
             } catch (e) {
@@ -50,7 +48,7 @@ export default function RootLayout({
                     window.location.reload()
                 } catch (e) {
                     console.error('Refresh token invalid:', e);
-                    router.push('/login');
+                    // router.push('/login');
                 }
             } finally {
                 setIsLoading(false);  // Always stop loading after all tries
@@ -58,16 +56,14 @@ export default function RootLayout({
         };
 
         checkAdmin();
-    }, [router]);
+    }, []);
 
     if (isLoading) {
         return (
-            <Loader />
+            <div className="h-screen w-screen justify-center items-center">
+                <Loader />
+            </div>
         );
-    }
-
-    if (!isAuthorized) {
-        router.push('/login')
     }
 
     return (

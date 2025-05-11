@@ -6,7 +6,7 @@ interface LoginInterfae {
 }
 
 const initialState: LoginInterfae = {
-    isloggedIn: false,
+    isloggedIn: typeof window !== 'undefined' ? localStorage.getItem('status') === 'true' : false,
 }
 
 
@@ -15,12 +15,13 @@ const loginSlice = createSlice({
     initialState: initialState,
     reducers: {
         showLogout: (state) => {
-            state.isloggedIn = true
+            state.isloggedIn = true;
             localStorage.setItem('status', 'true')
         },
         showLogin: (state) => {
-            state.isloggedIn = false
+            state.isloggedIn = false;
             localStorage.setItem('status', 'false')
+
         }
     }
 })

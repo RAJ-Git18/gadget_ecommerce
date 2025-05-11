@@ -27,6 +27,7 @@ export default function Navbar() {
     const handleLogout = async () => {
         // setisloggedin(false)
         dispatch(showLogin())
+        console.log(isloggedIn)
         try {
             const response = await axios.patch(`${apiUrl}/api/logout/`, {
                 userid: localStorage.getItem('userid'),

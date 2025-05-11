@@ -5,22 +5,24 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShoppingCart, Menu, X, User } from 'lucide-react'
 import Image from 'next/image'
-import { useSelector } from 'react-redux'
-import { RootState } from '../app/reduxtoolkit/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../app/reduxtoolkit/store'
 import axios from 'axios'
+import { showLogin } from '@/app/reduxtoolkit/loginStatus/loginSlice'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function AdminNavbar() {
     const router = useRouter()
-    const [isloggedin, setisloggedin] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [toggleUserIcon, settoggleUserIcon] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
-    useEffect(() => {
-        localStorage.getItem('status') === 'Logged In' && setisloggedin(true)
+    const { isloggedIn } = useSelector((state: RootState) => state.login)
+    const dispatch = useDispatch<AppDispatch>()
 
+
+    useEffect(() => {
         // Handle outside click
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -33,7 +35,7 @@ export default function AdminNavbar() {
     }, [])
 
     const handleLogout = async () => {
-        setisloggedin(false)
+        dispatch(showLogin())
         try {
             const response = await axios.patch(`${apiUrl}/api/logout/`, {
                 userid: localStorage.getItem('userid'),
@@ -86,7 +88,7 @@ export default function AdminNavbar() {
                     <ShoppingCart size={28} />
                 </button>
 
-                {!isloggedin ? (
+                {!isloggedIn ? (
                     <button
                         className="bg-[#1050B2] font-semibold text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                         onClick={() => router.push('/login')}
@@ -133,7 +135,7 @@ export default function AdminNavbar() {
                         >
                             <ShoppingCart size={24} />
                         </button>
-                        {!isloggedin ? (
+                        {!isloggedIn ? (
                             <button
                                 className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
                                 onClick={() => {

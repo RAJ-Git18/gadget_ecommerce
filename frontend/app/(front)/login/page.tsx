@@ -15,7 +15,7 @@ export default function LoginPage() {
     const router = useRouter()
 
     const dispatch = useDispatch()
-    const {isloggedIn} = useSelector((state:RootState)=>state.login)
+    const { isloggedIn } = useSelector((state: RootState) => state.login)
 
     const [isLogin, setIsLogin] = useState(true)
 

@@ -22,10 +22,10 @@ export default function LayoutWrapper({
         setUserType(storedUserType);
     }, []);
 
-    // Optional: Wait for userType to load (prevents flicker)
-    if (userType === null) {
-        return null; // or a loader/spinner
-    }
+    // // Optional: Wait for userType to load (prevents flicker)
+    // if (userType === null) {
+    //     return null; // or a loader/spinner
+    // }
 
     return (
         <html lang="en">

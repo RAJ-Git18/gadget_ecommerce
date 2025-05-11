@@ -4,8 +4,11 @@ import Image from 'next/image'
 import CarouselBestProducts from '@/components/CarouselBestProducts'
 import { CarouselFeaturedProducts } from '@/components/CarouselFeaturedProducts'
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from './reduxtoolkit/store';
 
 export default function HomePage() {
+  const {isloggedIn} = useSelector((state:RootState)=>state.login)
   const scrollToPosition = () => {
     window.scrollTo({
       top: 620,
@@ -15,7 +18,8 @@ export default function HomePage() {
 
   useEffect(() => {
     scrollToPosition()
-    console.log('ia m here')
+    console.log(isloggedIn)
+
   }, [])
   
 
